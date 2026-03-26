@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import { getPaymentType, extractDetailsFromText } from './extract.js';
 import { extractTextFromPdf } from './pdfParse.js';
 import * as XLSX from 'xlsx';
+import { renderZendeskClassifier } from './zendesk.js';
 
 /** Supported currencies: Israel, USA, India, Europe, UK. Invoices with these are auto-detected. */
 const SUPPORTED_CURRENCIES = [
@@ -483,7 +484,10 @@ function renderDashboard() {
     <header class="header">
       <div><span class="logo"><span class="orange">s</span><span class="white">canmarker</span></span>
       <span class="header-subtitle">Invoice Management</span></div>
-      <button type="button" class="btn-logout" id="btnLogout">Logout</button>
+      <div class="header-nav">
+        <button type="button" class="btn-nav" id="btnGoZendesk">Zendesk</button>
+        <button type="button" class="btn-logout" id="btnLogout">Logout</button>
+      </div>
     </header>
     <main class="main">
       <h1 class="page-title">Invoices</h1>
@@ -551,6 +555,7 @@ function renderDashboard() {
     await supabase.auth.signOut();
     renderLogin();
   };
+  document.getElementById('btnGoZendesk').onclick = () => renderZendeskClassifier(appEl, renderDashboard);
   document.querySelectorAll('.tab').forEach((t) => {
     t.onclick = () => {
       activeTab = t.dataset.tab;
