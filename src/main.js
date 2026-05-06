@@ -10,7 +10,7 @@ const SUPPORTED_CURRENCIES = [
   { code: 'INR', symbol: '₹', label: 'India (₹)' },
   { code: 'EUR', symbol: '€', label: 'Europe (€)' },
   { code: 'GBP', symbol: '£', label: 'UK (£)' },
-];
+];h
 
 const appEl = document.getElementById('app');
 let activeTab = 'open';
@@ -140,6 +140,7 @@ function rowToInvoice(row) {
     filePath: row.file_path,
     paymentType: row.payment_type,
     status: row.status || 'open',
+    paidAt: row.paid_at,
     details: {
       amount: row.amount,
       currency: row.currency,
@@ -171,6 +172,7 @@ function buildRow(invoice, listEl, refresh) {
     `<td>${renderBadge(invoice.paymentType)}</td>` +
     `<td>${statusBadge}</td>` +
     `<td>${escapeHtml(details.date || '—')}</td>` +
+    `<td>${invoice.paidAt ? escapeHtml(new Date(invoice.paidAt).toLocaleDateString('he-IL')) : '—'}</td>` +
     `<td>${paidBtn}` +
     (hasFile ? `<button type="button" class="btn primary btn-view">View</button>` : `<button type="button" class="btn" disabled title="File not saved">View</button>`) +
     `<button type="button" class="btn btn-edit">Edit</button>` +
@@ -198,7 +200,7 @@ function openEdit(row, invoice, listEl, refresh) {
   const editRow = document.createElement('tr');
   editRow.className = 'edit-row editing';
   editRow.dataset.editFor = invoice.id;
-  editRow.innerHTML = '<td colspan="10"></td>';
+  editRow.innerHTML = '<td colspan="11"></td>';
   const cell = editRow.querySelector('td');
   const form = document.createElement('div');
   form.className = 'edit-form';
@@ -340,7 +342,7 @@ async function refreshDashboard() {
   const list = await fetchInvoices(filters);
   listEl.innerHTML = '';
   if (list.length === 0) {
-    listEl.innerHTML = `<tr><td colspan="10" class="empty-state">No ${activeTab === 'open' ? 'open' : 'paid'} invoices found.</td></tr>`;
+    listEl.innerHTML = `<tr><td colspan="11" class="empty-state">No ${activeTab === 'open' ? 'open' : 'paid'} invoices found.</td></tr>`;
   } else {
     list.forEach((inv) => listEl.appendChild(buildRow(inv, listEl, refreshDashboard)));
   }
@@ -404,7 +406,7 @@ async function handleFiles(files, listEl, refresh) {
   for (const file of files) {
     const placeholder = document.createElement('tr');
     placeholder.className = 'loading';
-    placeholder.innerHTML = `<td colspan="10" class="empty-state">Processing: ${escapeHtml(file.name)}...</td>`;
+    placeholder.innerHTML = `<td colspan="11" class="empty-state">Processing: ${escapeHtml(file.name)}...</td>`;
     const emptyState = listEl.querySelector('.empty-state');
     if (emptyState) emptyState.closest('tr')?.remove();
     listEl.prepend(placeholder);
@@ -471,7 +473,7 @@ async function handleFiles(files, listEl, refresh) {
     } catch (e) {
       placeholder.remove();
       const errRow = document.createElement('tr');
-      errRow.innerHTML = `<td colspan="10"><div class="error">${escapeHtml(file.name)}: ${escapeHtml(e.message)}</div></td>`;
+      errRow.innerHTML = `<td colspan="11"><div class="error">${escapeHtml(file.name)}: ${escapeHtml(e.message)}</div></td>`;
       listEl.prepend(errRow);
     }
   }
@@ -537,6 +539,7 @@ function renderDashboard() {
               <th>Payment method</th>
               <th>Status</th>
               <th>Payment date</th>
+              <th>Paid on</th>
               <th>Actions</th>
             </tr>
           </thead>
