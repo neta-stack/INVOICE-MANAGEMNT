@@ -10,7 +10,7 @@ const SUPPORTED_CURRENCIES = [
   { code: 'INR', symbol: '₹', label: 'India (₹)' },
   { code: 'EUR', symbol: '€', label: 'Europe (€)' },
   { code: 'GBP', symbol: '£', label: 'UK (£)' },
-];h
+];
 
 const appEl = document.getElementById('app');
 let activeTab = 'open';
